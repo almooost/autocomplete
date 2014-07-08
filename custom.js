@@ -3,21 +3,25 @@
  * Provides functions for field autocompletion
  * @author Samuel Alfano 2014
  * @param String "#searchFieldID"
- * @param JSON {"#fieldID", "#fieldID"}
  * @param Array ["DatabaseField", "DatabaseField"]
+ * @param String {"#fieldID", "#fieldID"} // first element is first field in DB and so on
+ * @param String {"dbfield", "dbfield"}
  * @param String "/search.php"
  * @version v0.1 
 **/
-function aComplete(searchField, completeFields, labelField, postURL){
+function aComplete(searchField, labelField, completeFields, dbFields, postURL){
 
   // field which is used to search
   this.searchField = searchField;
 
+  // Displayed label
+  this.labelField = labelField;
+
   // autocomplete fields
   this.completeFields = JSON.parse(completeFields);
 
-  // Displayed label
-  this.labelField = labelField;
+// autocomplete fields
+  this.dbFields = JSON.parse(dbFields);
 
   // Define Post URL
   this.postURL = postURL
@@ -30,7 +34,6 @@ function aComplete(searchField, completeFields, labelField, postURL){
     "ü": "u"
   }
   // Declare names array
-  this.completeListArray = ["1","2","3"];
   this.completeList = [];
 
 }
@@ -70,7 +73,7 @@ aComplete.prototype.searchCall = function() {
           var counter = 0;
           // Return Array
           var rtnArray = '[{';
-          $.each(_this.completeFields, function(index, field){
+          $.each(_this.dbFields, function(index, field){
             if(counter == 0){
               rtnArray += '"label": "';
               $.each(_this.labelField, function(i, label){
@@ -154,9 +157,13 @@ aComplete.prototype.listComplete = function() {
       }) );
     },
     select: function(event, data) {
-      $.each(_this.completeFields, function(index, field){
-        $(field).val(data.item[field.replace(/\#/g,'')]);
-      });
+      for (var i = 0; i < _this.dbFields.length; i++) {
+        $(_this.completeFields[i]).val(data.item[_this.dbFields[i].replace(/\#/g,'')]);
+      };
+
+      // $.each(_this.completeFields, function(index, field){
+      //   $(field).val(data.item[field.replace(/\#/g,'')]);
+      // });
     }
   });
 
